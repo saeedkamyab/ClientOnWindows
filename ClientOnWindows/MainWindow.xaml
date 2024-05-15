@@ -1,0 +1,18 @@
+﻿<Window x:Class="ClientOnWindows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClientOnWindows"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="90*"/>
+        </Grid.RowDefinitions>
+       
+        <Button x:Name="BtnLoadData" Content="Load it" Grid.Row="0" Click="BtnLoadData_Click"/>
+        <ListBox x:Name="ListData" Grid.Row="1"/>
+    </Grid>
+</Window>
