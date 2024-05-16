@@ -66,10 +66,10 @@ namespace ClientOnWindows
             string username = txtUserName.Text;
             string pass = txtPassword.Text;
 
-            myToken = await GetJwtTokenAsync(username, pass, "https://localhost:7102/api/Auth");
-            if (myToken != null)
+          var resultString = await GetJwtTokenAsync(username, pass, "https://localhost:7102/api/Auth");
+            if (resultString != null)
             {
-                loginRes= JsonConvert.DeserializeObject<LoginResult>(myToken);
+                loginRes= JsonConvert.DeserializeObject<LoginResult>(resultString);
 
                 lblUserName.Content = loginRes.claims.FirstOrDefault(x => x.Type == "Username").Value;
                 lblFullName.Content = loginRes.claims.FirstOrDefault(x => x.Type == "FullName").Value;
@@ -78,6 +78,7 @@ namespace ClientOnWindows
                 brush.Color = Colors.Green;
                 gbAuthenticatedUser.Background = brush;
 
+                myToken=loginRes.TokenString;
                 BtnSendRequest.IsEnabled = true;
             }
         }
