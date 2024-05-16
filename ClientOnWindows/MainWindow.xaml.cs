@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 
 namespace ClientOnWindows
@@ -18,9 +19,13 @@ namespace ClientOnWindows
     public partial class MainWindow : Window
     {
         static HttpClient client = new HttpClient();
+        string myToken;
+        LoginResult loginRes=new LoginResult();
         public MainWindow()
         {
+
             InitializeComponent();
+
         }
 
         static async Task<string> GetJwtTokenAsync(string username, string password, string authUrl)
@@ -36,6 +41,7 @@ namespace ClientOnWindows
 
             // دریافت و پردازش توکن JWT
             var responseString = await response.Content.ReadAsStringAsync();
+
             var jwtToken = responseString;
 
             return jwtToken;
@@ -53,17 +59,47 @@ namespace ClientOnWindows
             string responseBody = await response.Content.ReadAsStringAsync();
             return responseBody;
         }
-        private async void BtnLoadData_Click(object sender, RoutedEventArgs e)
+
+
+        private async void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
-            string apiUrl = "https://localhost:7102/api/Users";
-            string myToken = await GetJwtTokenAsync("admin", "1234", "https://localhost:7102/api/Auth");
+            string username = txtUserName.Text;
+            string pass = txtPassword.Text;
 
-            var personList = JsonConvert.DeserializeObject<List<User>>(await SendRequestWithJwtToken(apiUrl, myToken));
-
-            foreach (var item in personList)
+            myToken = await GetJwtTokenAsync(username, pass, "https://localhost:7102/api/Auth");
+            if (myToken != null)
             {
-                ListData.Items.Add("User Name: " + item.UserName + "  Full Name: " + item.FullName + "  F Name: " + item.FName);
+                loginRes= JsonConvert.DeserializeObject<LoginResult>(myToken);
+
+                lblUserName.Content = loginRes.claims.FirstOrDefault(x => x.Type == "Username").Value;
+                lblFullName.Content = loginRes.claims.FirstOrDefault(x => x.Type == "FullName").Value;
+
+                SolidColorBrush brush = new SolidColorBrush();
+                brush.Color = Colors.Green;
+                gbAuthenticatedUser.Background = brush;
+
+                BtnSendRequest.IsEnabled = true;
             }
+        }
+
+        private async void BtnSendRequest_Click(object sender, RoutedEventArgs e)
+        {
+            // var res = JsonConvert.DeserializeObject<List<User>>(await SendRequestWithJwtToken(apiUrl, myToken));
+            string apiUrl = "";
+            if (cmbAction.SelectedIndex == 0) apiUrl = "https://localhost:7102/api/Articles";
+            if (cmbAction.SelectedIndex == 1) apiUrl = "https://localhost:7102/api/Books";
+            if (cmbAction.SelectedIndex == 2) apiUrl = "https://localhost:7102/api/Users";
+
+            try
+            {
+                Result.Text = await SendRequestWithJwtToken(apiUrl, myToken);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+
 
         }
     }
